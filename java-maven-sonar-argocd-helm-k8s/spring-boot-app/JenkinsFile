@@ -9,7 +9,7 @@ pipeline {
     environment {
         GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
         GIT_USER_NAME = "Jaaki26"
-        GIT_USER_EMAIL = "padala.janakiram26@gmail.com"
+        GIT_USER_EMAIL = "padala.janakiram11@gmail.com"
         SONAR_URL = "http://52.90.254.236:9000"
         DOCKER_IMAGE = "janakiram26/ultimate:${BUILD_NUMBER}"
     }
