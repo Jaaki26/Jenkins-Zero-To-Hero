@@ -50,10 +50,9 @@ Pipeline {
         DOCKER_IMAGE = "${DOCKER_IMAGE_BASE}:${BUILD_NUMBER}"
       }
       steps {
-        dir('java-maven-sonar-argocd-helm-k8s/spring-boot-app') {
-          // Build the Docker image using the correct context
-          sh "docker build -t ${DOCKER_IMAGE} ."
-        }
+        // Direct Docker build command, providing the full path to the app directory
+        sh "docker build -t ${DOCKER_IMAGE} java-maven-sonar-argocd-helm-k8s/spring-boot-app"
+        
         withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
           sh "docker push ${DOCKER_IMAGE}"
