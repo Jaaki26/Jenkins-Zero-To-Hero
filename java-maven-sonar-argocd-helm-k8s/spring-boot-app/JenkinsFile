@@ -5,12 +5,10 @@ pipeline {
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
-
   tools {
     jdk 'JDK 21'
     maven 'Maven 3.9.4'
   }
-
   environment {
     SONAR_URL = "http://51.143.219.233:9000"
     DOCKER_IMAGE_BASE = "janakiram26/ultimate-cicd"
@@ -18,14 +16,12 @@ pipeline {
     GIT_USER_NAME = "Jaaki26"
     GIT_USER_EMAIL = "padala.janakiram26@gmail.com"
   }
-
   stages {
     stage('Checkout') {
       steps {
         git branch: 'main', url: 'https://github.com/Jaaki26/Jenkins-Zero-To-Hero.git'
       }
     }
-
     stage('Build and Test') {
       steps {
         dir('java-maven-sonar-argocd-helm-k8s/spring-boot-app') {
@@ -34,7 +30,6 @@ pipeline {
         }
       }
     }
-
     stage('Static Code Analysis') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
@@ -44,16 +39,15 @@ pipeline {
         }
       }
     }
-
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "${DOCKER_IMAGE_BASE}:${BUILD_NUMBER}"
       }
       steps {
         dir('java-maven-sonar-argocd-helm-k8s/spring-boot-app') {
-          sh "docker build -t ${DOCKER_IMAGE} ."
+          // Enable BuildKit if using newer Docker versions
+          sh "DOCKER_BUILDKIT=1 docker build -t ${DOCKER_IMAGE} ."
         }
-
         withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
           sh "docker push ${DOCKER_IMAGE}"
@@ -61,7 +55,6 @@ pipeline {
         }
       }
     }
-
     stage('Update Deployment File') {
       steps {
         withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
@@ -79,7 +72,6 @@ pipeline {
       }
     }
   }
-
   post {
     success {
       echo "✅ Pipeline completed successfully for build ${BUILD_NUMBER}!"
